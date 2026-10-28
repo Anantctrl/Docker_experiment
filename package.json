@@ -68,22 +68,5 @@
     "ts-jest": "^29.2.0",
     "ts-node": "^10.9.2",
     "typescript": "~5.8.0"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|s)$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|s).ts"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node"
   }
 }
