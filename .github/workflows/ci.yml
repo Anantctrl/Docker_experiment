@@ -44,19 +44,32 @@ jobs:
           DATABASE_URL: "postgresql://taskuser:taskpass@localhost:5432/taskdb?schema=public"
         run: npx prisma migrate deploy
 
+      - name: Seed database
+        env:
+          DATABASE_URL: "postgresql://taskuser:taskpass@localhost:5432/taskdb?schema=public"
+        run: npm run prisma:seed
+
       - name: Lint
         run: npm run lint
 
       - name: Type check
         run: npx tsc --noEmit
 
-      - name: Run tests
+      - name: Run unit tests
         env:
           DATABASE_URL: "postgresql://taskuser:taskpass@localhost:5432/taskdb?schema=public"
           JWT_ACCESS_SECRET: test-access-secret
           JWT_REFRESH_SECRET: test-refresh-secret
           BCRYPT_SALT_ROUNDS: 12
         run: npm test
+
+      - name: Run integration tests
+        env:
+          DATABASE_URL: "postgresql://taskuser:taskpass@localhost:5432/taskdb?schema=public"
+          JWT_ACCESS_SECRET: test-access-secret
+          JWT_REFRESH_SECRET: test-refresh-secret
+          BCRYPT_SALT_ROUNDS: 12
+        run: npm run test:integration
 
       - name: Build
         run: npm run build
