@@ -1,8 +1,4 @@
-import {
-  ExecutionContext,
-  Injectable,
-  CanActivate,
-} from '@nestjs/common';
+import { ExecutionContext, Injectable, CanActivate } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 

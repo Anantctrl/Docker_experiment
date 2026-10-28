@@ -1,22 +1,5 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { Controller, Post, Get, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { CommentsService } from './comments.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import type { CommentResponse } from './interfaces/comment-response.interface';
@@ -34,10 +17,7 @@ export class CommentsController {
   @Post()
   @ApiOperation({ summary: 'Add a comment to a task' })
   @ApiResponse({ status: 201, description: 'Comment added' })
-  async create(
-    @Body() dto: CreateCommentDto,
-    @CurrentUser() user: UserPayload,
-  ): Promise<CommentResponse> {
+  async create(@Body() dto: CreateCommentDto, @CurrentUser() user: UserPayload): Promise<CommentResponse> {
     return this.commentsService.create(dto, user.sub);
   }
 
@@ -51,13 +31,13 @@ export class CommentsController {
     @Param('taskId') taskId: string,
     @CurrentUser() user: UserPayload,
     @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    @Query('limit') limit?: string
   ) {
     return this.commentsService.findByTask(
       taskId,
       user.sub,
       page ? parseInt(page, 10) : 1,
-      limit ? parseInt(limit, 10) : 50,
+      limit ? parseInt(limit, 10) : 50
     );
   }
 
@@ -69,7 +49,7 @@ export class CommentsController {
   async update(
     @Param('id') id: string,
     @Body('body') body: string,
-    @CurrentUser() user: UserPayload,
+    @CurrentUser() user: UserPayload
   ): Promise<CommentResponse> {
     return this.commentsService.update(id, user.sub, body);
   }
@@ -78,10 +58,7 @@ export class CommentsController {
   @ApiOperation({ summary: 'Delete a comment' })
   @ApiResponse({ status: 200, description: 'Comment deleted' })
   @ApiParam({ name: 'id' })
-  async remove(
-    @Param('id') id: string,
-    @CurrentUser() user: UserPayload,
-  ) {
+  async remove(@Param('id') id: string, @CurrentUser() user: UserPayload) {
     return this.commentsService.delete(id, user.sub);
   }
 }

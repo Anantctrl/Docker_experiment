@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { ProjectsService } from '../projects/projects.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -24,7 +19,7 @@ interface TaskFilter {
 export class TasksService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly projectsService: ProjectsService,
+    private readonly projectsService: ProjectsService
   ) {}
 
   async create(dto: CreateTaskDto, userId: string): Promise<TaskResponse> {
@@ -93,16 +88,10 @@ export class TasksService {
     return this.mapToResponse(task);
   }
 
-  async findAll(
-    userId: string,
-    filter: TaskFilter = {},
-  ): Promise<{ data: TaskResponse[]; meta: any }> {
+  async findAll(userId: string, filter: TaskFilter = {}): Promise<{ data: TaskResponse[]; meta: any }> {
     const accessibleProjects = await this.prisma.project.findMany({
       where: {
-        OR: [
-          { ownerId: userId },
-          { members: { some: { userId } } },
-        ],
+        OR: [{ ownerId: userId }, { members: { some: { userId } } }],
       },
       select: { id: true },
     });
@@ -240,7 +229,15 @@ export class TasksService {
       throw new ForbiddenException('Insufficient permissions to change status');
     }
 
-    if ((dto.title !== undefined || dto.description !== undefined || dto.dueDate !== undefined || dto.priority !== undefined) && !isAdmin && !isAssignee && !isCreator) {
+    if (
+      (dto.title !== undefined ||
+        dto.description !== undefined ||
+        dto.dueDate !== undefined ||
+        dto.priority !== undefined) &&
+      !isAdmin &&
+      !isAssignee &&
+      !isCreator
+    ) {
       throw new ForbiddenException('Insufficient permissions to update this task');
     }
 

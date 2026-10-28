@@ -1,8 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { TasksService } from '../tasks/tasks.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
@@ -12,7 +8,7 @@ import { CommentResponse } from './interfaces/comment-response.interface';
 export class CommentsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly tasksService: TasksService,
+    private readonly tasksService: TasksService
   ) {}
 
   async create(dto: CreateCommentDto, userId: string): Promise<CommentResponse> {
@@ -70,7 +66,7 @@ export class CommentsService {
     taskId: string,
     userId: string,
     page = 1,
-    limit = 50,
+    limit = 50
   ): Promise<{ data: CommentResponse[]; meta: any }> {
     const task = await this.prisma.task.findUnique({
       where: { id: taskId },
@@ -124,11 +120,7 @@ export class CommentsService {
     };
   }
 
-  async update(
-    id: string,
-    userId: string,
-    body: string,
-  ): Promise<CommentResponse> {
+  async update(id: string, userId: string, body: string): Promise<CommentResponse> {
     const comment = await this.prisma.comment.findUnique({
       where: { id },
       include: { task: { include: { project: true } } },

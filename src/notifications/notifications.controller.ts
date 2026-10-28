@@ -1,19 +1,5 @@
-import {
-  Controller,
-  Get,
-  Patch,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiQuery,
-  ApiParam,
-} from '@nestjs/swagger';
+import { Controller, Get, Patch, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiParam } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import type { NotificationResponse } from './interfaces/notification-response.interface';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -32,15 +18,11 @@ export class NotificationsController {
   @ApiResponse({ status: 200, description: 'Notifications list with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async findByUser(
-    @CurrentUser() user: UserPayload,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  async findByUser(@CurrentUser() user: UserPayload, @Query('page') page?: string, @Query('limit') limit?: string) {
     return this.notificationsService.findByUser(
       user.sub,
       page ? parseInt(page, 10) : 1,
-      limit ? parseInt(limit, 10) : 50,
+      limit ? parseInt(limit, 10) : 50
     );
   }
 
@@ -48,10 +30,7 @@ export class NotificationsController {
   @ApiOperation({ summary: 'Mark a notification as read' })
   @ApiResponse({ status: 200, description: 'Notification marked as read' })
   @ApiParam({ name: 'id' })
-  async markAsRead(
-    @Param('id') id: string,
-    @CurrentUser() user: UserPayload,
-  ): Promise<NotificationResponse> {
+  async markAsRead(@Param('id') id: string, @CurrentUser() user: UserPayload): Promise<NotificationResponse> {
     return this.notificationsService.markAsRead(id, user.sub);
   }
 

@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Get,
-  Patch,
-  Body,
-  UseGuards,
-  NotFoundException,
-} from '@nestjs/common';
+import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -32,10 +25,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Update current user profile' })
   @ApiResponse({ status: 200, description: 'Profile updated' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async updateMe(
-    @CurrentUser() user: UserPayload,
-    @Body() dto: UpdateUserDto,
-  ): Promise<UserResponse> {
+  async updateMe(@CurrentUser() user: UserPayload, @Body() dto: UpdateUserDto): Promise<UserResponse> {
     return this.usersService.updateProfile(user.sub, dto);
   }
 

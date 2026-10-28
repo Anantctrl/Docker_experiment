@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  NotFoundException,
-  ForbiddenException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common';
 import { Role } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -52,10 +47,7 @@ export class ProjectsService {
     return this.prisma.project.findMany({
       where: {
         isArchived: false,
-        OR: [
-          { ownerId: userId },
-          { members: { some: { userId } } },
-        ],
+        OR: [{ ownerId: userId }, { members: { some: { userId } } }],
       },
       include: {
         owner: {
@@ -301,14 +293,15 @@ export class ProjectsService {
       description: project.description,
       ownerId: project.ownerId,
       owner: project.owner,
-      members: project.members?.map((m: any) => ({
-        id: m.id,
-        projectId: m.projectId,
-        userId: m.userId,
-        role: m.role,
-        joinedAt: m.joinedAt,
-        user: m.user,
-      })) ?? [],
+      members:
+        project.members?.map((m: any) => ({
+          id: m.id,
+          projectId: m.projectId,
+          userId: m.userId,
+          role: m.role,
+          joinedAt: m.joinedAt,
+          user: m.user,
+        })) ?? [],
       taskCount: project._count?.tasks ?? 0,
       isArchived: project.isArchived,
       createdAt: project.createdAt,

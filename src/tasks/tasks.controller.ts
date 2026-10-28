@@ -1,22 +1,5 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { Controller, Post, Get, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
@@ -36,10 +19,7 @@ export class TasksController {
   @Post()
   @ApiOperation({ summary: 'Create a task' })
   @ApiResponse({ status: 201, description: 'Task created' })
-  async create(
-    @Body() dto: CreateTaskDto,
-    @CurrentUser() user: UserPayload,
-  ): Promise<TaskResponse> {
+  async create(@Body() dto: CreateTaskDto, @CurrentUser() user: UserPayload): Promise<TaskResponse> {
     return this.tasksService.create(dto, user.sub);
   }
 
@@ -59,7 +39,7 @@ export class TasksController {
     @Query('assigneeId') assigneeId?: string,
     @Query('projectId') projectId?: string,
     @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    @Query('limit') limit?: string
   ) {
     return this.tasksService.findAll(user.sub, {
       status,
@@ -77,10 +57,7 @@ export class TasksController {
   @ApiResponse({ status: 404, description: 'Task not found' })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @ApiParam({ name: 'id', description: 'Task UUID' })
-  async findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: UserPayload,
-  ): Promise<TaskResponse> {
+  async findOne(@Param('id') id: string, @CurrentUser() user: UserPayload): Promise<TaskResponse> {
     return this.tasksService.findOne(id, user.sub);
   }
 
@@ -92,7 +69,7 @@ export class TasksController {
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateTaskDto,
-    @CurrentUser() user: UserPayload,
+    @CurrentUser() user: UserPayload
   ): Promise<TaskResponse> {
     return this.tasksService.update(id, user.sub, dto);
   }
@@ -102,10 +79,7 @@ export class TasksController {
   @ApiResponse({ status: 200, description: 'Task deleted' })
   @ApiResponse({ status: 403, description: 'Insufficient permissions' })
   @ApiParam({ name: 'id' })
-  async remove(
-    @Param('id') id: string,
-    @CurrentUser() user: UserPayload,
-  ) {
+  async remove(@Param('id') id: string, @CurrentUser() user: UserPayload) {
     return this.tasksService.delete(id, user.sub);
   }
 }

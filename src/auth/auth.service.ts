@@ -1,13 +1,7 @@
-import {
-  Injectable,
-  ConflictException,
-  UnauthorizedException,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
 import { PrismaService } from '../database/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -20,7 +14,7 @@ export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   async register(dto: RegisterDto): Promise<{ id: string; email: string }> {
@@ -32,10 +26,7 @@ export class AuthService {
       throw new ConflictException('User with this email already exists');
     }
 
-    const saltRounds = parseInt(
-      this.configService.get('BCRYPT_SALT_ROUNDS', '12'),
-      10,
-    );
+    const saltRounds = parseInt(this.configService.get('BCRYPT_SALT_ROUNDS', '12'), 10);
     const passwordHash = await bcrypt.hash(dto.password, saltRounds);
 
     const user = await this.prisma.user.create({
@@ -126,10 +117,7 @@ export class AuthService {
     });
 
     const expiresAt = new Date();
-    const days = parseInt(
-      this.configService.get('JWT_REFRESH_EXPIRATION', '7d').replace('d', ''),
-      10,
-    );
+    const days = parseInt(this.configService.get('JWT_REFRESH_EXPIRATION', '7d').replace('d', ''), 10);
     expiresAt.setDate(expiresAt.getDate() + days);
 
     const session = this.prisma.session.create({

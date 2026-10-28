@@ -28,7 +28,7 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    }),
+    })
   );
 
   app.useGlobalInterceptors(new LoggingInterceptor(loggingService), new TimeoutInterceptor());
@@ -47,7 +47,7 @@ async function bootstrap() {
         description: 'Enter your JWT access token',
         in: 'header',
       },
-      'access-token',
+      'access-token'
     )
     .build();
 

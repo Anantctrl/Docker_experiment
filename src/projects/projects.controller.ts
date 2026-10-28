@@ -1,22 +1,5 @@
-import {
-  Controller,
-  Post,
-  Get,
-  Patch,
-  Delete,
-  Body,
-  Param,
-  UseGuards,
-  Query,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-  ApiParam,
-  ApiQuery,
-} from '@nestjs/swagger';
+import { Controller, Post, Get, Patch, Delete, Body, Param, UseGuards, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
@@ -36,10 +19,7 @@ export class ProjectsController {
   @Post()
   @ApiOperation({ summary: 'Create a project' })
   @ApiResponse({ status: 201, description: 'Project created' })
-  async create(
-    @Body() dto: CreateProjectDto,
-    @CurrentUser() user: UserPayload,
-  ): Promise<ProjectResponse> {
+  async create(@Body() dto: CreateProjectDto, @CurrentUser() user: UserPayload): Promise<ProjectResponse> {
     return this.projectsService.create(dto, user.sub);
   }
 
@@ -48,11 +28,7 @@ export class ProjectsController {
   @ApiResponse({ status: 200, description: 'Projects list' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async findAll(
-    @CurrentUser() user: UserPayload,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-  ) {
+  async findAll(@CurrentUser() user: UserPayload, @Query('page') page?: string, @Query('limit') limit?: string) {
     const projects = await this.projectsService.findAll(user.sub);
     const p = Math.max(1, parseInt(String(page ?? 1), 10));
     const l = Math.min(100, Math.max(1, parseInt(String(limit ?? 20), 10)));
@@ -75,10 +51,7 @@ export class ProjectsController {
   @ApiResponse({ status: 404, description: 'Project not found' })
   @ApiResponse({ status: 403, description: 'Access denied' })
   @ApiParam({ name: 'id', description: 'Project UUID' })
-  async findOne(
-    @Param('id') id: string,
-    @CurrentUser() user: UserPayload,
-  ): Promise<ProjectResponse> {
+  async findOne(@Param('id') id: string, @CurrentUser() user: UserPayload): Promise<ProjectResponse> {
     return this.projectsService.findOne(id, user.sub);
   }
 
@@ -90,7 +63,7 @@ export class ProjectsController {
   async update(
     @Param('id') id: string,
     @Body() dto: UpdateProjectDto,
-    @CurrentUser() user: UserPayload,
+    @CurrentUser() user: UserPayload
   ): Promise<ProjectResponse> {
     return this.projectsService.update(id, user.sub, dto);
   }
@@ -100,10 +73,7 @@ export class ProjectsController {
   @ApiResponse({ status: 200, description: 'Project deleted' })
   @ApiResponse({ status: 403, description: 'Only owner can delete' })
   @ApiParam({ name: 'id' })
-  async remove(
-    @Param('id') id: string,
-    @CurrentUser() user: UserPayload,
-  ) {
+  async remove(@Param('id') id: string, @CurrentUser() user: UserPayload) {
     return this.projectsService.delete(id, user.sub);
   }
 
@@ -112,11 +82,7 @@ export class ProjectsController {
   @ApiResponse({ status: 201, description: 'Member added' })
   @ApiResponse({ status: 403, description: 'Admin access required' })
   @ApiParam({ name: 'id' })
-  async addMember(
-    @Param('id') projectId: string,
-    @Body() dto: AddMemberDto,
-    @CurrentUser() user: UserPayload,
-  ) {
+  async addMember(@Param('id') projectId: string, @Body() dto: AddMemberDto, @CurrentUser() user: UserPayload) {
     return this.projectsService.addMember(projectId, dto.userId, dto, user.sub);
   }
 
@@ -128,7 +94,7 @@ export class ProjectsController {
   async removeMember(
     @Param('id') projectId: string,
     @Param('userId') userId: string,
-    @CurrentUser() user: UserPayload,
+    @CurrentUser() user: UserPayload
   ) {
     return this.projectsService.removeMember(projectId, userId, user.sub);
   }
@@ -137,10 +103,7 @@ export class ProjectsController {
   @ApiOperation({ summary: 'Leave a project' })
   @ApiResponse({ status: 200, description: 'Left project' })
   @ApiParam({ name: 'id' })
-  async leave(
-    @Param('id') projectId: string,
-    @CurrentUser() user: UserPayload,
-  ) {
+  async leave(@Param('id') projectId: string, @CurrentUser() user: UserPayload) {
     return this.projectsService.leaveProject(projectId, user.sub);
   }
 }

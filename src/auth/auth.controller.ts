@@ -1,13 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpCode,
-  HttpStatus,
-  UseGuards,
-  Request,
-  Post as PostMethod,
-} from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
@@ -57,7 +48,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Logged out successfully' })
   async logout(
     @CurrentUser() user: UserPayload,
-    @Body('refreshToken') refreshToken: string,
+    @Body('refreshToken') refreshToken: string
   ): Promise<{ message: string }> {
     await this.authService.logout(refreshToken);
     return { message: 'Logged out successfully' };

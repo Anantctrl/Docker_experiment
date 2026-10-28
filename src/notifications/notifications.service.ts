@@ -7,11 +7,7 @@ import { NotificationResponse } from './interfaces/notification-response.interfa
 export class NotificationsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findByUser(
-    userId: string,
-    page = 1,
-    limit = 50,
-  ): Promise<{ data: NotificationResponse[]; meta: any }> {
+  async findByUser(userId: string, page = 1, limit = 50): Promise<{ data: NotificationResponse[]; meta: any }> {
     const p = Math.max(1, page);
     const l = Math.min(100, Math.max(1, limit));
     const offset = (p - 1) * l;
@@ -67,12 +63,7 @@ export class NotificationsService {
     return { message: 'All notifications marked as read' };
   }
 
-  async createNotification(
-    userId: string,
-    type: NotificationType,
-    title: string,
-    message?: string,
-  ) {
+  async createNotification(userId: string, type: NotificationType, title: string, message?: string) {
     return this.prisma.notification.create({
       data: {
         userId,

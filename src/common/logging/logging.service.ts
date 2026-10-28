@@ -8,11 +8,7 @@ const { combine, timestamp, errors, json, printf } = format;
 export class LoggingService implements LoggerService {
   private readonly logger = createLogger({
     level: process.env.LOG_LEVEL ?? 'info',
-    format: combine(
-      timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-      errors({ stack: true }),
-      json(),
-    ),
+    format: combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), errors({ stack: true }), json()),
     transports: [
       new transports.Console({
         format: combine(
@@ -20,7 +16,7 @@ export class LoggingService implements LoggerService {
           printf(({ level, message, context, stack }) => {
             const ctx = context ? ` [${context}]` : '';
             return `${timestamp()} ${level}:${ctx} ${message}${stack ? `\n${stack}` : ''}`;
-          }),
+          })
         ),
       }),
       new DailyRotateFile({
