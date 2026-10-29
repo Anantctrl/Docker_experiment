@@ -14,6 +14,8 @@ import { cleanDatabase, createTestApp, teardownTestApp } from './test-setup';
 
 const BASE_URL = '/api/v1';
 
+const uniqueEmail = () => `integration_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`;
+
 async function registerAndLogin(app: INestApplication, email: string, password = 'SecurePass123!'): Promise<string> {
   await request(app.getHttpServer())
     .post(`${BASE_URL}/auth/register`)
@@ -76,7 +78,7 @@ describe('Tasks Integration', () => {
 
   beforeEach(async () => {
     await cleanDatabase(prisma);
-    token = await registerAndLogin(app, 'owner@example.com');
+    token = await registerAndLogin(app, uniqueEmail());
     projectId = await createProject(app, token);
   });
 
@@ -179,7 +181,7 @@ describe('Tasks Integration', () => {
   });
 
   it('should assign a task to a project member', async () => {
-    const { id: memberId, token: memberToken } = await createUser(app, prisma, 'member@example.com');
+    const { id: memberId, token: memberToken } = await createUser(app, prisma, uniqueEmail());
     await addMember(app, token, projectId, memberId, 'MEMBER');
 
     const create = await request(app.getHttpServer())
@@ -198,7 +200,7 @@ describe('Tasks Integration', () => {
   });
 
   it('should not assign a task to a non-member', async () => {
-    const nonMemberId = await createUser(app, prisma, 'outsider@example.com');
+    const nonMemberId = await createUser(app, prisma, uniqueEmail());
 
     const create = await request(app.getHttpServer())
       .post(`${BASE_URL}/tasks`)
@@ -220,7 +222,7 @@ describe('Tasks Integration', () => {
       .send({ projectId, title: 'Private Task' })
       .expect(201);
 
-    const { token: otherToken } = await createUser(app, prisma, 'outsider@example.com');
+    const { token: otherToken } = await createUser(app, prisma, uniqueEmail());
 
     await request(app.getHttpServer())
       .get(`${BASE_URL}/tasks/${create.body.id}`)

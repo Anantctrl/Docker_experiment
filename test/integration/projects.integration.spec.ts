@@ -14,6 +14,8 @@ import { cleanDatabase, createTestApp, teardownTestApp } from './test-setup';
 
 const BASE_URL = '/api/v1';
 
+const uniqueEmail = () => `integration_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`;
+
 async function registerAndLogin(app: INestApplication, email: string, password = 'SecurePass123!'): Promise<string> {
   await request(app.getHttpServer())
     .post(`${BASE_URL}/auth/register`)
@@ -49,7 +51,7 @@ describe('Projects Integration', () => {
 
   beforeEach(async () => {
     await cleanDatabase(prisma);
-    token = await registerAndLogin(app, 'owner@example.com');
+    token = await registerAndLogin(app, uniqueEmail());
   });
 
   it('should create a project', async () => {
@@ -109,7 +111,7 @@ describe('Projects Integration', () => {
       .expect(201);
 
     // Create a second user and log in
-    const otherToken = await registerAndLogin(app, 'other@example.com');
+    const otherToken = await registerAndLogin(app, uniqueEmail());
 
     await request(app.getHttpServer())
       .get(`${BASE_URL}/projects/${create.body.id}`)
@@ -141,14 +143,14 @@ describe('Projects Integration', () => {
       .expect(201);
 
     // Add another user as a MEMBER (not admin)
-    const otherUserId = await createUser(prisma, 'member@example.com');
+    const otherUserId = await createUser(prisma, uniqueEmail());
     await request(app.getHttpServer())
       .post(`${BASE_URL}/projects/${create.body.id}/members`)
       .set('Authorization', `Bearer ${token}`)
       .send({ userId: otherUserId, role: 'MEMBER' })
       .expect(201);
 
-    const otherToken = await registerAndLogin(app, 'member@example.com');
+    const otherToken = await registerAndLogin(app, uniqueEmail());
 
     await request(app.getHttpServer())
       .patch(`${BASE_URL}/projects/${create.body.id}`)
@@ -182,14 +184,14 @@ describe('Projects Integration', () => {
       .send({ name: 'Shared' })
       .expect(201);
 
-    const otherUserId = await createUser(prisma, 'nonowner@example.com');
+    const otherUserId = await createUser(prisma, uniqueEmail());
     await request(app.getHttpServer())
       .post(`${BASE_URL}/projects/${create.body.id}/members`)
       .set('Authorization', `Bearer ${token}`)
       .send({ userId: otherUserId, role: 'ADMIN' })
       .expect(201);
 
-    const otherToken = await registerAndLogin(app, 'nonowner@example.com');
+    const otherToken = await registerAndLogin(app, uniqueEmail());
 
     await request(app.getHttpServer())
       .delete(`${BASE_URL}/projects/${create.body.id}`)

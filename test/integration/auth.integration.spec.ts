@@ -14,16 +14,11 @@ import { cleanDatabase, createTestApp, teardownTestApp } from './test-setup';
 
 const BASE_URL = '/api/v1';
 
+const uniqueEmail = () => `integration_${Date.now()}_${Math.random().toString(36).slice(2)}@example.com`;
+
 describe('Auth Integration', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-
-  const newUser = {
-    email: 'integration@example.com',
-    password: 'SecurePass123!',
-    firstName: 'Integration',
-    lastName: 'User',
-  };
 
   beforeAll(async () => {
     app = await createTestApp();
@@ -39,6 +34,13 @@ describe('Auth Integration', () => {
   });
 
   it('should register a new user', async () => {
+    const newUser = {
+      email: uniqueEmail(),
+      password: 'SecurePass123!',
+      firstName: 'Integration',
+      lastName: 'User',
+    };
+
     const response = await request(app.getHttpServer()).post(`${BASE_URL}/auth/register`).send(newUser).expect(201);
 
     expect(response.body.email).toBe(newUser.email);
@@ -46,12 +48,26 @@ describe('Auth Integration', () => {
   });
 
   it('should not register with an existing email', async () => {
+    const newUser = {
+      email: uniqueEmail(),
+      password: 'SecurePass123!',
+      firstName: 'Integration',
+      lastName: 'User',
+    };
+
     await request(app.getHttpServer()).post(`${BASE_URL}/auth/register`).send(newUser).expect(201);
 
     await request(app.getHttpServer()).post(`${BASE_URL}/auth/register`).send(newUser).expect(409);
   });
 
   it('should login and return access + refresh tokens', async () => {
+    const newUser = {
+      email: uniqueEmail(),
+      password: 'SecurePass123!',
+      firstName: 'Integration',
+      lastName: 'User',
+    };
+
     await request(app.getHttpServer()).post(`${BASE_URL}/auth/register`).send(newUser);
 
     const response = await request(app.getHttpServer())
@@ -67,6 +83,13 @@ describe('Auth Integration', () => {
   });
 
   it('should reject login with wrong password', async () => {
+    const newUser = {
+      email: uniqueEmail(),
+      password: 'SecurePass123!',
+      firstName: 'Integration',
+      lastName: 'User',
+    };
+
     await request(app.getHttpServer()).post(`${BASE_URL}/auth/register`).send(newUser);
 
     await request(app.getHttpServer())
@@ -79,6 +102,13 @@ describe('Auth Integration', () => {
   });
 
   it('should refresh an access token', async () => {
+    const newUser = {
+      email: uniqueEmail(),
+      password: 'SecurePass123!',
+      firstName: 'Integration',
+      lastName: 'User',
+    };
+
     await request(app.getHttpServer()).post(`${BASE_URL}/auth/register`).send(newUser);
 
     const login = await request(app.getHttpServer()).post(`${BASE_URL}/auth/login`).send({
@@ -103,6 +133,13 @@ describe('Auth Integration', () => {
   });
 
   it('should logout and revoke the refresh token', async () => {
+    const newUser = {
+      email: uniqueEmail(),
+      password: 'SecurePass123!',
+      firstName: 'Integration',
+      lastName: 'User',
+    };
+
     await request(app.getHttpServer()).post(`${BASE_URL}/auth/register`).send(newUser);
 
     const login = await request(app.getHttpServer()).post(`${BASE_URL}/auth/login`).send({
