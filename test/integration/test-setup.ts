@@ -9,6 +9,7 @@ export async function createTestApp(): Promise<INestApplication> {
   }).compile();
 
   const app = moduleFixture.createNestApplication();
+  app.setGlobalPrefix('/api/v1');
   await app.init();
   return app;
 }
