@@ -7,5 +7,6 @@
   },
   "collectCoverageFrom": ["**/*.ts"],
   "coverageDirectory": "../coverage",
-  "testEnvironment": "node"
+  "testEnvironment": "node",
+  "maxWorkers": 1
 }

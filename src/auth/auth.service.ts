@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
@@ -18,29 +18,34 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<{ id: string; email: string }> {
-    const existing = await this.prisma.user.findUnique({
-      where: { email: dto.email },
-    });
-
-    if (existing) {
-      throw new ConflictException('User with this email already exists');
-    }
-
     const saltRounds = parseInt(this.configService.get('BCRYPT_SALT_ROUNDS', '12'), 10);
     const passwordHash = await bcrypt.hash(dto.password, saltRounds);
 
-    const user = await this.prisma.user.create({
-      data: {
-        email: dto.email,
-        passwordHash,
-        firstName: dto.firstName ?? null,
-        lastName: dto.lastName ?? null,
-      },
-      select: { id: true, email: true },
-    });
+    try {
+      const user = await this.prisma.user.create({
+        data: {
+          email: dto.email,
+          passwordHash,
+          firstName: dto.firstName ?? null,
+          lastName: dto.lastName ?? null,
+        },
+        select: { id: true, email: true },
+      });
 
-    this.logger.log(`User registered: ${user.id}`);
-    return user;
+      this.logger.log(`User registered: ${user.id}`);
+      return user;
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        const existing = await this.prisma.user.findUnique({
+          where: { email: dto.email },
+          select: { id: true, email: true },
+        });
+        if (existing) {
+          return existing;
+        }
+      }
+      throw error;
+    }
   }
 
   async login(dto: LoginDto): Promise<TokensResponse> {
