@@ -1,0 +1,35 @@
+
+# 1. Dependencies installed locally
+# Docker should install its own dependencies during the image build.
+**/node_modules
+
+# 2. Files generated on a developer's machine
+# The container should build its own fresh output.
+**/dist
+**/coverage
+**/.nestjs
+*.tsbuildinfo
+
+# 3. Git history and metadata
+# The running application does not need repository history.
+.git
+.gitignore
+.gitattributes
+
+# 4. Local environment files
+# Never send local environment configuration to the build.
+.env
+.env.*
+
+# 5. Logs and temporary files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# 6. Operating system and editor files
+.DS_Store
+Thumbs.db
+.vscode
+.idea
