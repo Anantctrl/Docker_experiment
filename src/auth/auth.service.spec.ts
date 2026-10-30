@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { PrismaService } from '../database/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { UnauthorizedException } from '@nestjs/common';
+import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
@@ -91,11 +91,7 @@ describe('AuthService', () => {
     expect(prisma.user.create).toHaveBeenCalled();
   });
 
-  it('should return existing user if email already exists (idempotent)', async () => {
-    (prisma.user.create as jest.Mock).mockRejectedValueOnce({
-      code: 'P2002',
-      meta: { target: ['email'] },
-    });
+  it('should throw ConflictException if email already exists', async () => {
     (prisma.user.findUnique as jest.Mock).mockResolvedValue(mockUser);
 
     const dto: RegisterDto = {
@@ -103,10 +99,7 @@ describe('AuthService', () => {
       password: 'SecurePass123!',
     };
 
-    const result = await service.register(dto);
-
-    expect(result.id).toBe(mockUser.id);
-    expect(result.email).toBe(mockUser.email);
+    await expect(service.register(dto)).rejects.toThrow(ConflictException);
   });
 
   it('should throw UnauthorizedException for invalid credentials', async () => {

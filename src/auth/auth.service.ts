@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
@@ -18,6 +18,14 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<{ id: string; email: string }> {
+    const existing = await this.prisma.user.findUnique({
+      where: { email: dto.email },
+    });
+
+    if (existing) {
+      throw new ConflictException('User with this email already exists');
+    }
+
     const saltRounds = parseInt(this.configService.get('BCRYPT_SALT_ROUNDS', '12'), 10);
     const passwordHash = await bcrypt.hash(dto.password, saltRounds);
 
@@ -36,13 +44,7 @@ export class AuthService {
       return user;
     } catch (error: any) {
       if (error.code === 'P2002') {
-        const existing = await this.prisma.user.findUnique({
-          where: { email: dto.email },
-          select: { id: true, email: true },
-        });
-        if (existing) {
-          return existing;
-        }
+        throw new ConflictException('User with this email already exists');
       }
       throw error;
     }
@@ -62,7 +64,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.generateTokens(user.id, user.role);
+    return await this.generateTokens(user.id, user.role);
   }
 
   async refresh(refreshToken: string): Promise<TokensResponse> {
@@ -82,7 +84,7 @@ export class AuthService {
     }
 
     await this.prisma.session.delete({ where: { id: session.id } });
-    return this.generateTokens(session.userId, session.user.role);
+    return await this.generateTokens(session.userId, session.user.role);
   }
 
   async logout(refreshToken: string): Promise<void> {
@@ -108,7 +110,7 @@ export class AuthService {
     return user;
   }
 
-  private generateTokens(userId: string, role: string): TokensResponse {
+  private async generateTokens(userId: string, role: string): Promise<TokensResponse> {
     const payload = { sub: userId, role };
 
     const accessToken = this.jwtService.sign(payload, {
@@ -133,7 +135,7 @@ export class AuthService {
       },
     });
 
-    void session;
+    await session;
 
     return { accessToken, refreshToken };
   }
