@@ -116,6 +116,9 @@ describe('Auth Integration', () => {
       password: newUser.password,
     });
 
+    // Small delay so JWT iat claim differs between tokens
+    await new Promise((resolve) => setTimeout(resolve, 1100));
+
     const refresh = await request(app.getHttpServer())
       .post(`${BASE_URL}/auth/refresh`)
       .send({ refreshToken: login.body.refreshToken })
